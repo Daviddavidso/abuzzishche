@@ -79,7 +79,7 @@ section{position:relative}
 .win--dark .win__status{color:var(--muted)}
 
 /* ---------- угловые подписи ---------- */
-.corners{position:absolute;inset:clamp(.9rem,.5rem + 1vw,1.6rem) var(--gutter);left:calc(var(--dock-w) + var(--gutter));pointer-events:none;font:700 .75rem/1.25 var(--mono);text-transform:uppercase;letter-spacing:.06em;color:var(--muted);z-index:1}
+.corners{--edge:calc(max(0px,(100% - 1240px - 2 * var(--gutter)) / 2) + var(--gutter));position:absolute;inset:clamp(.9rem,.5rem + 1vw,1.6rem) var(--edge);pointer-events:none;font:700 .75rem/1.25 var(--mono);text-transform:uppercase;letter-spacing:.06em;color:var(--muted);z-index:1}
 .corner{position:absolute;max-width:14em}
 .corner--tl{top:0;left:0}.corner--tr{top:0;right:0;text-align:right}
 .corner--bl{bottom:0;left:0;display:flex;align-items:center;gap:.5rem}.corner--br{bottom:0;right:0;display:flex;align-items:center;gap:.45rem}
