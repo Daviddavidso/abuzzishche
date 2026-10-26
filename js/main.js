@@ -68,8 +68,17 @@
   if (form) {
     var status = document.getElementById('lead-status');
     var say = function (text) {
-      status.hidden = false;
-      setTimeout(function () { status.textContent = text; }, 60);
+      status.textContent = '';
+      setTimeout(function () { status.textContent = text; }, 100);
+    };
+    /* ошибка попадает в описание поля только когда она есть */
+    var setErr = function (el, show) {
+      var id = el.id + '-err';
+      var ids = (el.getAttribute('aria-describedby') || '').split(' ').filter(function (x) { return x && x !== id; });
+      if (show) ids.push(id);
+      if (ids.length) el.setAttribute('aria-describedby', ids.join(' ')); else el.removeAttribute('aria-describedby');
+      el.setAttribute('aria-invalid', String(show));
+      document.getElementById(id).hidden = !show;
     };
     var rules = [
       ['f-name', function (v) { return v.trim().length > 0; }],
@@ -78,17 +87,16 @@
     ];
     form.addEventListener('submit', function (e) {
       e.preventDefault();
+      status.textContent = '';
       var first = null;
       rules.forEach(function (r) {
         var el = document.getElementById(r[0]);
         var ok = r[1](el.value);
-        el.setAttribute('aria-invalid', String(!ok));
-        document.getElementById(r[0] + '-err').hidden = ok;
+        setErr(el, !ok);
         if (!ok && !first) first = el;
       });
       var agree = document.getElementById('f-ok');
-      agree.setAttribute('aria-invalid', String(!agree.checked));
-      document.getElementById('f-ok-err').hidden = agree.checked;
+      setErr(agree, !agree.checked);
       if (!agree.checked && !first) first = agree;
       if (first) { first.focus(); return; }
       if (form.elements.site.value) return;
