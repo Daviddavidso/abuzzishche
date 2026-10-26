@@ -12,7 +12,7 @@
 
   /* если кадр выше экрана (зум, крупный шрифт) — мягкое прилипание вместо жёсткого */
   var checkSnap = function () {
-    var tall = scenes.some(function (s) { return s.scrollHeight > window.innerHeight + 2; });
+    var tall = scenes.some(function (s) { return s.offsetHeight > window.innerHeight + 2; });
     doc.classList.toggle('snap-soft', tall);
   };
   checkSnap();
@@ -31,6 +31,40 @@
   };
   window.addEventListener('scroll', function () { if (!ticking) { ticking = true; requestAnimationFrame(paint); } }, { passive: true });
   paint();
+
+  /* один жест колеса/трекпада = один кадр (инерция трекпада не проматывает дальше) */
+  var site = document.querySelector('.site');
+  var lockUntil = 0, lastWheel = 0, busy = false;
+  var tops = function () { return scenes.map(function (s) { return s.offsetTop; }).concat(site ? site.offsetTop : []); };
+  var go = function (y) {
+    busy = true;
+    window.scrollTo({ top: y, behavior: reduced ? 'auto' : 'smooth' });
+  };
+  window.addEventListener('wheel', function (e) {
+    if (e.ctrlKey || doc.classList.contains('snap-soft') || !window.matchMedia('(min-height:500px) and (min-width:360px)').matches) return;
+    var now = Date.now();
+    var gap = now - lastWheel;
+    lastWheel = now;
+    var T = tops(), last = T.length - 1, y = window.scrollY;
+    var inFilm = y < T[last] - 2;
+    var atSiteTop = Math.abs(y - T[last]) <= 2;
+    var dir = e.deltaY > 0 ? 1 : e.deltaY < 0 ? -1 : 0;
+    if (!dir || !(inFilm || (atSiteTop && dir < 0))) return;
+    e.preventDefault();
+    /* пока идёт жест (события чаще чем раз в 250 мс) или не вышло время — стоим */
+    if (busy || now < lockUntil || gap < 250) { lockUntil = Math.max(lockUntil, now + 250); return; }
+    var i = 0, best = Infinity;
+    T.forEach(function (t, k) { var d = Math.abs(t - y); if (d < best) { best = d; i = k; } });
+    var to = Math.max(0, Math.min(last, i + dir));
+    if (to === i) return;
+    lockUntil = now + 900;
+    go(T[to]);
+  }, { passive: false });
+  var settle;
+  window.addEventListener('scroll', function () {
+    clearTimeout(settle);
+    settle = setTimeout(function () { busy = false; }, 140);
+  }, { passive: true });
 
   var fmt = function (n) { return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ' '); };
   var countUp = function (el) {

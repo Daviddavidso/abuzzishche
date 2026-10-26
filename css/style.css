@@ -613,7 +613,8 @@ textarea.input{min-height:150px;resize:vertical}
 
 /* ===================== короткий метр (интро главной) ===================== */
 html.has-film{scroll-padding-top:0;scroll-behavior:auto}  /* без плавной прокрутки: иначе прыжок через кадры мелькает чёрным-белым */
-@media (prefers-reduced-motion:no-preference) and (min-height:600px) and (min-width:360px){
+/* один жест прокрутки = один кадр: жёсткое прилипание + обязательная остановка на каждом кадре */
+@media (min-height:500px) and (min-width:360px){
   html.has-film:not(.snap-off){scroll-snap-type:y mandatory}
   html.has-film.snap-soft{scroll-snap-type:y proximity}
 }
@@ -639,7 +640,7 @@ html:not(.js) .filmhead{position:absolute}
 .skipfilm:focus-visible{outline:2px dashed var(--ink);outline-offset:-5px}
 
 /* кадры */
-.sc{position:relative;min-height:100vh;min-height:100svh;display:flex;flex-direction:column;justify-content:safe center;padding:calc(var(--bt) + clamp(1.5rem,1rem + 3vh,3.5rem)) var(--gutter) calc(var(--bb) + clamp(1.5rem,1rem + 3vh,3.5rem));scroll-snap-align:start;overflow:clip}
+.sc{scroll-snap-stop:always;position:relative;min-height:100vh;min-height:100svh;display:flex;flex-direction:column;justify-content:safe center;padding:calc(var(--bt) + clamp(1.5rem,1rem + 3vh,3.5rem)) var(--gutter) calc(var(--bb) + clamp(1.5rem,1rem + 3vh,3.5rem));scroll-snap-align:start;overflow:clip}
 .sc--black{background:var(--ink);color:var(--cream);--focus:#fff}
 .sc--white{background:#fff;color:var(--ink);--focus:#0D0D0D}
 .sc__in{width:100%;max-width:1240px;margin:0 auto}
