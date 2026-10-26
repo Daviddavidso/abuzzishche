@@ -141,10 +141,20 @@
     setTimeout(function () { el.textContent = fmt(to); }, dur + 400);
   };
 
+  /* табло: цифры перещёлкиваются и встают на место по очереди */
+  var flapRoll = function (row) {
+    row.querySelectorAll('[data-d]').forEach(function (d, i) {
+      var final = d.getAttribute('data-d');
+      var timer = setInterval(function () { d.textContent = String(Math.floor(Math.random() * 10)); }, 55);
+      setTimeout(function () { clearInterval(timer); d.textContent = final; }, 420 + i * 110);
+    });
+  };
+
   var show = function (el) {
     if (el.classList.contains('is-in')) return;
     el.classList.add('is-in');
     el.querySelectorAll('[data-count]').forEach(countUp);
+    el.querySelectorAll('.flap').forEach(flapRoll);
   };
   var els = document.querySelectorAll('.reveal');
   var io = new IntersectionObserver(function (entries) {
