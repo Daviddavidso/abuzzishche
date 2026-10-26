@@ -74,6 +74,47 @@
     });
   }
 
+  /* форма обратной связи */
+  var form = document.getElementById('lead');
+  if (form) {
+    var status = document.getElementById('lead-status');
+    var say = function (text) {
+      status.hidden = false;
+      setTimeout(function () { status.textContent = text; }, 60);
+    };
+    var rules = [
+      ['f-name', function (v) { return v.trim().length > 0; }],
+      ['f-tg', function (v) { return /^@?[A-Za-z0-9_]{5,32}$/.test(v.trim()); }],
+      ['f-msg', function (v) { return v.trim().length > 2; }]
+    ];
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var first = null;
+      rules.forEach(function (r) {
+        var el = document.getElementById(r[0]);
+        var ok = r[1](el.value);
+        el.setAttribute('aria-invalid', String(!ok));
+        document.getElementById(r[0] + '-err').hidden = ok;
+        if (!ok && !first) first = el;
+      });
+      var agree = document.getElementById('f-ok');
+      agree.setAttribute('aria-invalid', String(!agree.checked));
+      document.getElementById('f-ok-err').hidden = agree.checked;
+      if (!agree.checked && !first) first = agree;
+      if (first) { first.focus(); return; }
+      if (form.elements.site.value) return;
+      var endpoint = form.getAttribute('data-endpoint');
+      if (!endpoint) {
+        say('Это превью сайта: на боевой версии вопрос сразу уйдёт менеджеру в Telegram, а ответ придёт тебе туда же.');
+        return;
+      }
+      fetch(endpoint, { method: 'POST', body: new FormData(form) })
+        .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+        .then(function () { form.reset(); say('Спасибо! Вопрос отправлен, ответим в Telegram.'); })
+        .catch(function () { say('Не получилось отправить. Напиши менеджеру в Telegram: @crunkwork.'); });
+    });
+  }
+
   /* мобилка: фокус не уходит под панель задач */
   document.addEventListener('focusin', function (e) {
     if (!nav || window.innerWidth >= 1024 || nav.contains(e.target)) return;
