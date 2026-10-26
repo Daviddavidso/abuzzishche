@@ -4,10 +4,10 @@
   var doc = document.documentElement;
   var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  /* меню «Пуск» — disclosure-навигация */
-  var nav = document.querySelector('.dock');
-  var btn = nav && nav.querySelector('.start');
-  var menu = document.getElementById('start-menu');
+  /* меню в шапке (на узких экранах) — disclosure-навигация */
+  var nav = document.querySelector('.topnav');
+  var btn = nav && nav.querySelector('.menu-btn');
+  var menu = document.getElementById('site-menu');
   if (btn && menu) {
     menu.hidden = true;
     var set = function (open, focusBtn) {
@@ -28,17 +28,6 @@
     menu.addEventListener('click', function (e) {
       if (e.target.closest('a')) set(false);
     });
-  }
-
-  /* часы на панели задач */
-  var clock = document.querySelector('.dock__clock');
-  if (clock) {
-    var tick = function () {
-      var d = new Date();
-      clock.textContent = String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
-    };
-    tick();
-    setInterval(tick, 20000);
   }
 
   /* бегущая строка: пауза */
@@ -114,14 +103,6 @@
         .catch(function () { say('Не получилось отправить. Напиши менеджеру в Telegram: @crunkwork.'); });
     });
   }
-
-  /* мобилка: фокус не уходит под панель задач */
-  document.addEventListener('focusin', function (e) {
-    if (!nav || window.innerWidth >= 1024 || nav.contains(e.target)) return;
-    var r = e.target.getBoundingClientRect();
-    var limit = window.innerHeight - nav.offsetHeight - 12;
-    if (r.bottom > limit) window.scrollBy(0, r.bottom - limit);
-  });
 
   /* появление блоков, счёт цифр, прорисовка линий */
   if (reduced || !('IntersectionObserver' in window)) return;
