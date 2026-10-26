@@ -429,3 +429,4 @@ section{position:relative}
 .win-btn:focus-visible,.dock__link:focus-visible{outline:2px dashed var(--ink);outline-offset:-6px}
 .win-btn--red:focus-visible,.dock__link--red:focus-visible,.money .win-btn:focus-visible{outline-color:#fff}
 .seg input:focus-visible + .win-btn{outline:2px dashed var(--ink);outline-offset:-6px}
+@media (max-width:860px){.hero__lines{display:none}}
